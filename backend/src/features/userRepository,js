@@ -1,0 +1,14 @@
+import { DB_TYPE } from '../config/db.config.js';
+// Import model SQL / MongoDB kamu di sini nanti
+
+export const createUserRepository = {
+  save: async (userData) => {
+    if (DB_TYPE === 'mongodb') {
+      // return await MongoUserModel.create(userData);
+      return { db: 'mongodb', data: userData }; 
+    } else {
+      // return await SequelizeUserModel.create(userData);
+      return { db: 'sql', data: userData };
+    }
+  }
+};

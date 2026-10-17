@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+// import './App.css'
 
 function App() {
   const [pesan, setPesan] = useState('Sedang menyambungkan ke backend...')
