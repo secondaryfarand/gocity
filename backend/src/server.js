@@ -5,6 +5,9 @@ import { fileURLToPath } from 'url';
 import { connectDatabase } from './config/db.config.js';
 import apiRouter from './routes/router.js';
 
+import { initAqiCron } from './features/aqi/aqi.cron.js';
+
+
 // import dotenc from 'dotenv'
 
 const app = express();
@@ -46,5 +49,7 @@ if (process.env.NODE_ENV !== 'production') {
     console.log(`Server Backend berjalan di Port http://localhost:${PORT}`);
   });
 }
+
+initAqiCron();
 
 export default app;

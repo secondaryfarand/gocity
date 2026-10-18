@@ -51,7 +51,7 @@ export const complaintRepository = {
       return await MongoComplaintModel.findOneAndUpdate(
         { ticketNumber },
         { status: newStatus },
-        { new: true }
+        { returnDocument: 'after' }
       );
     }
     if (DB_TYPE === 'mysql' || DB_TYPE === 'postgres') {

@@ -21,6 +21,7 @@
     "multer": "^2.4.0",
     "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.24.6",
+    "node-cron": "^4.6.0",
     "pg": "^8.23.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8"
