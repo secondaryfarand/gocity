@@ -3,7 +3,6 @@ import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
-console.log("URI:", process.env.MONGODB_URI)
 
 const DB_TYPE = process.env.DB_TYPE || 'mongodb';
 let dbInstance = null;

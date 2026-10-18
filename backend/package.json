@@ -13,10 +13,13 @@
   "type": "module",
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.23",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.6",
     "dotenv": "^18.0.8",
     "express": "^5.3.0",
     "mongoose": "^9.11.2",
+    "multer": "^2.4.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.24.6",
     "pg": "^8.23.1",
     "pg-hstore": "^2.3.4",

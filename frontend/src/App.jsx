@@ -1,150 +1,80 @@
-import { useEffect, useState } from 'react'
-
-import { Show } from '@clerk/react'; // Komponen kontrol kondisi login Clerk
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Show, UserButton, useUser } from '@clerk/react';
 import { LoginPage } from './features/auth/pages/LoginPages';
-import { DashboardView } from './features/auth/components/DashboadView';
+import ComplaintForm from './features/complaint/components/ComplaintForm';
+import ComplaintList from './features/complaint/components/ComplaintList';
+import StaffDashboard from './features/complaint/components/StaffDashboard'; // Komponen dashboard staf & peta
 import './App.css';
 
-function App() {
+export default function App() {
   return (
-    <>
-      {/* 🔓 KONDISI A: Jika user BELUM login, paksa tampilkan halaman Login */}
-      <Show when="signed-out">
-        <LoginPage />
-      </Show>
+    <Router>
+      <div>
+        {/* 🔓 KONDISI A: Jika user BELUM login */}
+        <Show when="signed-out">
+          <LoginPage />
+        </Show>
 
-      {/* 🔒 KONDISI B: Jika user SUDAH login, buka gerbang Dashboard & Sinkronisasi DB */}
-      <Show when="signed-in">
-        <DashboardView />
-      </Show>
-    </>
+        {/* 🔒 KONDISI B: Jika user SUDAH login */}
+        <Show when="signed-in">
+          {/* Navbar Navigasi Utama */}
+          <nav style={navStyles.nav}>
+            <h3 style={{ margin: 0, color: '#007bff' }}>GoCity - Layanan Publik</h3>
+            <div style={navStyles.links}>
+              <Link to="/" style={navStyles.link}>Buat Aduan</Link>
+              <Link to="/track" style={navStyles.link}>Lacak Tiket</Link>
+              <Link to="/staff-dashboard" style={navStyles.linkStaff}>Dashboard Staf</Link>
+            </div>
+            <UserButton afterSignOutUrl="/" />
+          </nav>
+
+          {/* Pengaturan Halaman (Routes) */}
+          <div style={{ padding: '20px' }}>
+            <Routes>
+              <Route path="/" element={<ComplaintForm />} />
+              <Route path="/track" element={<ComplaintList />} />
+              <Route path="/staff-dashboard" element={<StaffDashboard />} />
+            </Routes>
+          </div>
+        </Show>
+      </div>
+    </Router>
   );
 }
 
-export default App;
+const navStyles = {
+  nav: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 30px', background: '#fff', borderBottom: '1px solid #ddd', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' },
+  links: { display: 'flex', gap: '20px', alignItems: 'center' },
+  link: { textDecoration: 'none', color: '#333', fontWeight: 'bold', fontSize: '14px' },
+  linkStaff: { textDecoration: 'none', color: '#fff', background: '#28a745', padding: '6px 12px', borderRadius: '4px', fontWeight: 'bold', fontSize: '14px' }
+};
 
 
+// import { useEffect, useState } from 'react'
 
-
-// import { useState } from 'react'
-// import heroImg from './assets/hero.png'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from './assets/vite.svg'
-// import './App.css'
+// import { Show } from '@clerk/react'; // Komponen kontrol kondisi login Clerk
+// import { LoginPage } from './features/auth/pages/LoginPages';
+// import { DashboardView } from './features/auth/components/DashboadView';
+// import './App.css';
 
 // function App() {
-//   const [count, setCount] = useState(0)
-
 //   return (
 //     <>
-//       <section id="center">
-//         <div className="hero">
-//           <img src={heroImg} className="base" width="170" height="179" alt="" />
-//           <img src={reactLogo} className="framework" alt="React logo" />
-//           <img src={viteLogo} className="vite" alt="Vite logo" />
-//         </div>
-//         <div>
-//           <h1>Get started</h1>
-//           <p>
-//             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-//           </p>
-//         </div>
-//         <button
-//           type="button"
-//           className="counter"
-//           onClick={() => setCount((count) => count + 1)}
-//         >
-//           Count is {count}
-//         </button>
-//       </section>
+//       {/* 🔓 KONDISI A: Jika user BELUM login, paksa tampilkan halaman Login */}
+//       <Show when="signed-out">
+//         <LoginPage />
+//       </Show>
 
-//       <div className="ticks"></div>
-
-//       <section id="next-steps">
-//         <div id="docs">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#documentation-icon"></use>
-//           </svg>
-//           <h2>Documentation</h2>
-//           <p>Your questions, answered</p>
-//           <ul>
-//             <li>
-//               <a href="https://vite.dev/" target="_blank">
-//                 <img className="logo" src={viteLogo} alt="" />
-//                 Explore Vite
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://react.dev/" target="_blank">
-//                 <img className="button-icon" src={reactLogo} alt="" />
-//                 Learn more
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//         <div id="social">
-//           <svg className="icon" role="presentation" aria-hidden="true">
-//             <use href="/icons.svg#social-icon"></use>
-//           </svg>
-//           <h2>Connect with us</h2>
-//           <p>Join the Vite community</p>
-//           <ul>
-//             <li>
-//               <a href="https://github.com/vitejs/vite" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#github-icon"></use>
-//                 </svg>
-//                 GitHub
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://chat.vite.dev/" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#discord-icon"></use>
-//                 </svg>
-//                 Discord
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://x.com/vite_js" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#x-icon"></use>
-//                 </svg>
-//                 X.com
-//               </a>
-//             </li>
-//             <li>
-//               <a href="https://bsky.app/profile/vite.dev" target="_blank">
-//                 <svg
-//                   className="button-icon"
-//                   role="presentation"
-//                   aria-hidden="true"
-//                 >
-//                   <use href="/icons.svg#bluesky-icon"></use>
-//                 </svg>
-//                 Bluesky
-//               </a>
-//             </li>
-//           </ul>
-//         </div>
-//       </section>
-
-//       <div className="ticks"></div>
-//       <section id="spacer"></section>
+//       {/* 🔒 KONDISI B: Jika user SUDAH login, buka gerbang Dashboard & Sinkronisasi DB */}
+//       <Show when="signed-in">
+//         <DashboardView />
+//       </Show>
 //     </>
-//   )
+//   );
 // }
 
-// export default App
+// export default App;
+
+
+
