@@ -5,6 +5,8 @@ import { fileURLToPath } from 'url';
 import { connectDatabase } from './config/db.config.js';
 import apiRouter from './routes/router.js';
 
+// import dotenc from 'dotenv'
+
 const app = express();
 
 app.use(cors());
@@ -19,6 +21,20 @@ app.get('/api/test', (req, res) => {
 // Penanganan __dirname di ES Modules (Wajib ditambahkan jika nanti ingin menyatukan build di Vercel/Render)
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+// app.use((err, req, res, next) => {
+//   if (err) {
+//     console.error("🔴 Satpam Clerk menolak akses:", err.message);
+//     return res.status(401).json({
+//       success: false,
+//       error: "Sesi login Anda tidak valid atau sudah habis. Silakan masuk ulang."
+//     });
+//   }
+//   next();
+// });
+// console.log("URI:", process.env.PORT)
+// console.log("PORT:", process.env.PORT)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

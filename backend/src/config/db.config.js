@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
+console.log("URI:", process.env.MONGODB_URI)
 
 const DB_TYPE = process.env.DB_TYPE || 'mongodb';
 let dbInstance = null;
@@ -11,6 +12,7 @@ export const connectDatabase = async () => {
   if (DB_TYPE === 'mongodb') {
     try {
       const conn = await mongoose.connect(process.env.MONGODB_URI);
+      
       console.log(`MongoDB Terhubung: ${conn.connection.host}`);
       dbInstance = conn;
       return dbInstance;

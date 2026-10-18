@@ -1,29 +1,28 @@
 import { useEffect, useState } from 'react'
-// import './App.css'
+
+import { Show } from '@clerk/react'; // Komponen kontrol kondisi login Clerk
+import { LoginPage } from './features/auth/pages/LoginPages';
+import { DashboardView } from './features/auth/components/DashboadView';
+import './App.css';
 
 function App() {
-  const [pesan, setPesan] = useState('Sedang menyambungkan ke backend...')
-
-  useEffect(() => {
-    // Memanggil API Express menggunakan relative path berkat proxy Vite
-    fetch('/api/test')
-      .then(res => res.json())
-      .then(data => setPesan(data.message))
-      .catch(err => setPesan('Gagal terhubung ke backend!'));
-  }, [])
-
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px', fontFamily: 'sans-serif' }}>
-      <h1>Uji Coba Fullstack React + Express</h1>
-      <div style={{ padding: '20px', border: '1px solid #ccc', display: 'inline-block', borderRadius: '8px' }}>
-        <h3>Respon dari Backend:</h3>
-        <p style={{ color: 'green', fontWeight: 'bold' }}>{pesan}</p>
-      </div>
-    </div>
-  )
+    <>
+      {/* 🔓 KONDISI A: Jika user BELUM login, paksa tampilkan halaman Login */}
+      <Show when="signed-out">
+        <LoginPage />
+      </Show>
+
+      {/* 🔒 KONDISI B: Jika user SUDAH login, buka gerbang Dashboard & Sinkronisasi DB */}
+      <Show when="signed-in">
+        <DashboardView />
+      </Show>
+    </>
+  );
 }
 
-export default App
+export default App;
+
 
 
 

@@ -6,8 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Mengarahkan semua request '/api' ke server Express lokal
-      '/api': 'http://localhost:5000'
+      '/api': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        secure: false,
+      }
     }
   }
 })

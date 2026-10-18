@@ -11,6 +11,7 @@ export const authService = {
       user = await authRepository.createUser(clerkUserData);
     } else {
       console.log(`[Auth Service] User lama login (${clerkUserData.email}). Sinkronisasi sesi sukses.`);
+      console.log("Data mentah dari Clerk:", clerkUserData);
     }
 
     return user;

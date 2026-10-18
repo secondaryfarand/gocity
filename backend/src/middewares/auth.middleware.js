@@ -1,52 +1,44 @@
-import { createClerkClient } from '@clerk/clerk-sdk-node';
+import { ClerkExpressRequireAuth, createClerkClient } from '@clerk/clerk-sdk-node';
 
-// Menginisialisasi Clerk menggunakan kunci rahasia dari file .env
+// Inisialisasi client backend Clerk untuk menarik profil mendalam
 const clerkClient = createClerkClient({ 
   secretKey: process.env.CLERK_SECRET_KEY 
 });
 
-export const requireAuth = async (req, res, next) => {
-  try {
-    // 1. Ambil token token dari header HTTP (Authorization: Bearer <token>)
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Akses ditolak. Token autentikasi tidak ditemukan.' 
-      });
+export const requireAuth = [
+  // 1. Satpam resmi Clerk memeriksa apakah token dari React valid
+  ClerkExpressRequireAuth({
+    secretKey: process.env.CLERK_SECRET_KEY
+  }),
+  // 2. Jika valid, ambil data profil Google asli Anda langsung dari server Clerk
+  async (req, res, next) => {
+    try {
+      const authData = req.auth;
+
+      if (!authData || !authData.userId) {
+        return res.status(401).json({ success: false, error: 'Sesi login tidak valid.' });
+      }
+
+      // 🟢 LANGKAH UTAMA: Ambil data profil asli Anda dari server Clerk menggunakan userId token
+      const clerkUser = await clerkClient.users.getUser(authData.userId);
+
+      // Cari alamat email utama yang diverifikasi oleh sistem Google
+      const primaryEmail = clerkUser.emailAddresses.find(
+        (email) => email.id === clerkUser.primaryEmailAddressId
+      )?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
+
+      // Bungkus data asli Anda ke objek req.user
+      req.user = {
+        clerkId: clerkUser.id,
+        name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'Warga Publik',
+        email: primaryEmail || 'tidak_ada_email@clerk.com',
+        picture: clerkUser.imageUrl
+      };
+
+      next(); // Teruskan data asli Anda ke Controller ➡️ Service ➡️ Simpan ke MongoDB!
+    } catch (error) {
+      console.error("🔴 Gagal menarik profil dari Clerk:", error.message);
+      return res.status(500).json({ success: false, error: 'Gagal memproses profil: ' + error.message });
     }
-
-    // Mengambil string token acaknya saja
-    const token = authHeader.split(' ')[1];
-
-    // 2. Verifikasi apakah token tersebut asli atau palsu
-    const requestState = await clerkClient.authenticateRequest(req);
-
-    // Jika token palsu, tidak valid, atau sudah kedaluwarsa
-    if (!requestState.isSignedIn) {
-      return res.status(401).json({ 
-        success: false, 
-        error: 'Sesi login tidak valid atau sudah habis.' 
-      });
-    }
-
-    // 3. Jika token asli, ambil data profil pengguna dari server Clerk
-    const clerkUser = await clerkClient.users.getUser(requestState.toAuth().userId);
-
-    // 4. Bungkus data profil ke objek 'req.user' agar bisa dibaca oleh controller kita nanti
-    req.user = {
-      clerkId: clerkUser.id,
-      name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim(),
-      email: clerkUser.emailAddresses[0]?.emailAddress,
-      picture: clerkUser.imageUrl
-    };
-
-    // Lolos pemeriksaan, silakan lanjut ke rute / controller tujuan
-    next();
-  } catch (error) {
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Gagal memproses autentikasi: ' + error.message 
-    });
   }
-};
+];

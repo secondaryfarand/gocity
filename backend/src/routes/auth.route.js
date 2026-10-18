@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth } from '../middewares/auth.middleware.js'; 
-import { authController } from '../features/auth/auth.cntroller.js'; 
+import { authController } from '../features/auth/auth.controller.js'; 
 
 
 // import { signUp, registerNewUser, login, loginUser, logout } from '../controllers/auth/auth.controller.js';
@@ -20,7 +20,8 @@ authRouter.get('/secret-profile', requireAuth, (req, res) => {
   });
 });
 
-authRouter.post('/auth/sync', requireAuth, authController.handleSync);
+// authRouter.post('/auth/sync', requireAuth, authController.handleSync);
+authRouter.post('/sync', requireAuth, authController.handleSync);
 
 
 export default authRouter;

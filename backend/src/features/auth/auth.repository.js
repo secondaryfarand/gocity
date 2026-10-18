@@ -4,7 +4,7 @@ import { SqlUserModel, MongoUserModel } from '../../models/user.model.js';
 export const authRepository = {
   findByClerkId: async (clerkId) => {
     if (DB_TYPE === 'mongodb') {
-      return await MongoUserModel.findOne({ clerkId });
+      return await MongoUserModel.findOne({ clerkId: clerkId  });
     }
     if (DB_TYPE === 'mysql' || DB_TYPE === 'postgres') {
       return await SqlUserModel.findOne({ where: { clerkId } });
