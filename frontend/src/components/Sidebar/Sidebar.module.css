@@ -1,0 +1,195 @@
+/* Sidebar Desktop Utama */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1000;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.02);
+}
+
+/* Kondisi saat Sidebar Ditutup (Collapsed) */
+.sidebarCollapsed {
+  width: 80px;
+}
+
+/* Header Sidebar (Logo & Tombol Toggle) */
+.sidebarHeader {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.brandArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.brandLogo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.brandTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.toggleBtn {
+  background: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.toggleBtn:hover {
+  background: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+/* Konten Navigasi di Tengah */
+.sidebarBody {
+  padding: 20px 14px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.menuGroupTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+}
+
+.sidebarCollapsed .menuGroupTitle {
+  display: none;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.menuItem i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.menuItem:hover {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+}
+
+.menuItemActive {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Bagian Bawah Sidebar (Info Sistem & Quick Status) */
+.sidebarFooter {
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-app);
+}
+
+.systemStatusCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  background-color: #16a34a;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(22, 163, 74, 0.5);
+  flex-shrink: 0;
+}
+
+.statusText {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.statusSub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.sidebarCollapsed .systemStatusCard {
+  justify-content: center;
+  padding: 8px;
+}
+
+.sidebarCollapsed .statusText,
+.sidebarCollapsed .statusSub {
+  display: none;
+}
+
+/* Sembunyikan elemen teks saat collapse */
+.sidebarCollapsed .brandTitle,
+.sidebarCollapsed .menuItem span {
+  display: none;
+}
+
+/* Sembunyikan sidebar di layar HP (karena pakai navbar mobile sebelumnya) */
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+}

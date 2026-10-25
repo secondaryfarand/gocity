@@ -3,6 +3,10 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+import 'leaflet.heat'; // Mengaktifkan plugin heatmap
+import { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
+
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -14,8 +18,40 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+function HeatmapLayer({ points }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !points || points.length === 0) return;
+
+    // Format data untuk leaflet.heat: [lat, lng, intensity]
+    const heatPoints = points.map(p => [p.latitude, p.longitude, p.severity || 1]);
+
+    const heatLayer = L.heatLayer(heatPoints, {
+      // radius: 25,
+      radius: 50,
+      // blur: 15,
+      blur: 1,
+      maxZoom: 17,
+      gradient: { 0.4: 'blue', 0.65: 'lime', 1: 'red' } // Gradasi warna zona aman ke zona merah
+    });
+
+    heatLayer.addTo(map);
+
+    const canvas = map.getContainer().querySelector('canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    }
+    return () => {
+      map.removeLayer(heatLayer); // Bersihkan layer saat komponen di-unmount
+    };
+  }, [map, points]);
+
+  return null;
+}
+
 // Tambahkan aqiList pada props
-export default function ComplaintMap({ complaints, cctvList = [], aqiList = [], onSelectCCTV }) {
+export default function ComplaintMap({ complaints, cctvList = [], aqiList = [], crimeList = [], onSelectCCTV }) {
   const mappedComplaints = complaints.filter(
     (c) => c.latitude !== null && c.longitude !== null && !isNaN(c.latitude) && !isNaN(c.longitude)
   );
@@ -32,6 +68,8 @@ export default function ComplaintMap({ complaints, cctvList = [], aqiList = [], 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+
+        <HeatmapLayer points={crimeList} />
 
         {/* 1. Marker Pengaduan Warga */}
         {mappedComplaints.map((complaint) => (

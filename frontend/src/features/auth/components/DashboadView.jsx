@@ -1,4 +1,4 @@
-// import { useClerk } from '@clerk/react';
+// import { useClerk } from '@clerk/clerk-react';
 // import { useSyncUser } from '../hooks/useSyncUser';
 
 // export function DashboardView() {
@@ -37,7 +37,7 @@
 
 
 import React, { useState } from 'react';
-import { UserButton, useUser } from '@clerk/react';
+import { UserButton, useUser } from '@clerk/clerk-react';
 import ComplaintForm from '../../complaint/components/ComplaintForm'; // Sesuaikan path foldernya
 import ComplaintList from '../../complaint/components/ComplaintList'; // Sesuaikan path foldernya
 

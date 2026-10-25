@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { upload } from '../middewares/upload.middleware.js';
-import { requireAuth } from '../middewares/auth.middleware.js'; 
-import { verifyStaffRole } from '../middewares/rbac.middleware.js';
+import { upload } from '../middlewares/upload.middleware.js';
+import { requireAuth } from '../middlewares/auth.middleware.js'; 
+import { verifyStaffRole } from '../middlewares/rbac.middleware.js';
 
 import { complaintController } from '../features/complaint/complaint.controller.js';
 

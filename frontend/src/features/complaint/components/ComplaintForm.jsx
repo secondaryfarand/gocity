@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useAuth } from '@clerk/clerk-react';
+import styles from './ComplaintForm.module.css';
 
 export default function ComplaintForm() {
+  const { getToken } = useAuth();
   const [formData, setFormData] = useState({
     category: 'infrastructure',
     content: '',
@@ -15,7 +18,6 @@ export default function ComplaintForm() {
   const [submitting, setSubmitting] = useState(false);
   const [responseTicket, setResponseTicket] = useState(null);
 
-  // Handle perubahan text input
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -24,7 +26,6 @@ export default function ComplaintForm() {
     });
   };
 
-  // Handle perubahan file gambar
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -33,7 +34,6 @@ export default function ComplaintForm() {
     }
   };
 
-  // Fitur Ambil Lokasi GPS Saat Ini
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       alert('Geolocation tidak didukung oleh browser Anda.');
@@ -53,16 +53,17 @@ export default function ComplaintForm() {
       (error) => {
         alert('Gagal mengambil lokasi: ' + error.message);
         setLoadingLocation(false);
-      }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
   };
 
-  // Handle Submit Form ke Backend
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
+      const token = await getToken();
       const data = new FormData();
       data.append('category', formData.category);
       data.append('content', formData.content);
@@ -74,15 +75,17 @@ export default function ComplaintForm() {
 
       const res = await fetch('/api/complaints', {
         method: 'POST',
-        body: data, // Mengirim multi-part form data
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data,
       });
 
       const result = await res.json();
       if (result.success) {
         setResponseTicket(result.data.ticketNumber);
-        alert('Pengaduan berhasil dikirim!');
       } else {
-        alert('Gagal mengirim pengaduan: ' + result.message);
+        alert('Gagal mengirim pengaduan: ' + (result.message || 'Terjadi kesalahan'));
       }
     } catch (err) {
       console.error(err);
@@ -93,28 +96,32 @@ export default function ComplaintForm() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Buat Pengaduan Layanan Publik</h2>
-      <p style={styles.subtitle}>Sampaikan laporan atau fasilitas umum yang rusak di sekitar Anda.</p>
+    <div className={styles.container}>
+      <div className={styles.headerSection}>
+        <h2 className={styles.title}>Buat Pengaduan Layanan Publik</h2>
+        <p className={styles.subtitle}>Sampaikan laporan kerusakan fasilitas umum atau gangguan lingkungan di sekitar Anda.</p>
+      </div>
 
       {responseTicket ? (
-        <div style={styles.successBox}>
-          <h3>Laporan Berhasil Terkirim! 🎉</h3>
-          <p>Nomor Tiket Anda:</p>
-          <div style={styles.ticketBadge}>{responseTicket}</div>
-          <p style={{ fontSize: '14px', color: '#555' }}>
-            Simpan nomor tiket ini untuk melacak status pengaduan Anda.
+        <div className={styles.successBox}>
+          <div className={styles.successIcon}><i className="fa-solid fa-circle-check"></i></div>
+          <h3 style={{ margin: '0 0 4px 0', fontSize: '20px', color: '#0f172a' }}>Laporan Berhasil Terkirim!</h3>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>Simpan nomor tiket unik Anda untuk melacak status penanganan.</p>
+          <div className={styles.ticketBadge}>{responseTicket}</div>
+          <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '20px' }}>
+            Petugas kelurahan akan segera memverifikasi laporan Anda.
           </p>
-          <button style={styles.buttonPrimary} onClick={() => window.location.reload()}>
+          <button className={styles.submitBtn} onClick={() => window.location.reload()}>
             Buat Laporan Lain
           </button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          
           {/* Kategori */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Kategori Pengaduan:</label>
-            <select name="category" value={formData.category} onChange={handleChange} style={styles.input}>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Kategori Pengaduan</label>
+            <select name="category" value={formData.category} onChange={handleChange} className={styles.select}>
               <option value="infrastructure">Infrastruktur (Jalan, Lampu, dll)</option>
               <option value="cleanliness">Kebersihan (Sampah, Saluran Air)</option>
               <option value="public_service">Pelayanan Publik</option>
@@ -122,111 +129,112 @@ export default function ComplaintForm() {
             </select>
           </div>
 
-          {/* Isi Aduan */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Isi Pengaduan / Masalah:</label>
-            <textarea
-              name="content"
-              rows="4"
-              value={formData.content}
-              onChange={handleChange}
-              placeholder="Jelaskan detail masalah secara jelas..."
-              required
-              style={styles.textarea}
-            />
-          </div>
-
           {/* Saran */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Saran / Solusi (Opsional):</label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Saran / Solusi Warga (Opsional)</label>
             <input
               type="text"
               name="suggestion"
               value={formData.suggestion}
               onChange={handleChange}
               placeholder="Contoh: Mohon segera ditambal..."
-              style={styles.input}
+              className={styles.input}
             />
           </div>
 
-          {/* Fitur Ambil Lokasi GPS */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Lokasi Kejadian (Koordinat GPS):</label>
-            <div style={styles.row}>
-              <input
-                type="text"
-                placeholder="Latitude"
-                value={formData.latitude}
-                readOnly
-                style={{ ...styles.input, flex: 1 }}
-              />
-              <input
-                type="text"
-                placeholder="Longitude"
-                value={formData.longitude}
-                readOnly
-                style={{ ...styles.input, flex: 1 }}
-              />
+          {/* Isi Aduan (Full Width) */}
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <label className={styles.label}>Detail Pengaduan / Masalah</label>
+            <textarea
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              placeholder="Jelaskan kronologi dan detail masalah secara jelas..."
+              required
+              className={styles.textarea}
+            />
+          </div>
+
+         <div className={styles.formGroup}>
+            <label className={styles.label}>Titik Koordinat Kejadian (GPS)</label>
+            <div className={styles.locationBox}>
+              <div className={styles.coordinateGrid}>
+                <input
+                  type="text"
+                  name="latitude"
+                  placeholder="Latitude (Contoh: -8.6500)"
+                  value={formData.latitude}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+                <input
+                  type="text"
+                  name="longitude"
+                  placeholder="Longitude (Contoh: 115.2166)"
+                  value={formData.longitude}
+                  onChange={handleChange}
+                  className={styles.input}
+                />
+              </div>
               <button
                 type="button"
                 onClick={handleGetLocation}
-                style={styles.buttonSecondary}
+                className={styles.locationBtn}
                 disabled={loadingLocation}
               >
-                {loadingLocation ? 'Mencari...' : '📍 Ambil Lokasi Saat Ini'}
+                <i className={`fa-solid ${loadingLocation ? 'fa-spinner fa-spin' : 'fa-location-dot'}`}></i>
+                {loadingLocation ? 'Mendeteksi GPS...' : 'Ambil Lokasi Saat Ini (Auto-Pin)'}
               </button>
             </div>
           </div>
 
-          {/* Upload Gambar */}
-          <div style={styles.formGroup}>
-            <label style={styles.label}>Unggah Foto Bukti:</label>
-            <input type="file" accept="image/png, image/jpeg, image/jpg" onChange={handleImageChange} />
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Bukti Foto Kondisi Lapangan</label>
+            <div className={styles.uploadZone}>
+              <input 
+                type="file" 
+                accept="image/png, image/jpeg, image/jpg" 
+                onChange={handleImageChange} 
+                className={styles.hiddenFileInput} 
+              />
+              <div className={styles.uploadContent}>
+                <i className={`fa-solid ${imageFile ? 'fa-circle-check' : 'fa-cloud-arrow-up'} ${styles.uploadIcon}`}></i>
+                <span>{imageFile ? `Terpilih: ${imageFile.name}` : 'Seret foto atau klik untuk unggah'}</span>
+                <span style={{ fontSize: '11px' }}>PNG, JPG (Maks. 5MB)</span>
+              </div>
+            </div>
             {imagePreview && (
-              <div style={{ marginTop: '10px' }}>
-                <img src={imagePreview} alt="Preview" style={styles.previewImage} />
+              <div className={styles.previewContainer}>
+                <img src={imagePreview} alt="Preview Bukti" className={styles.previewImage} />
               </div>
             )}
           </div>
 
-          {/* Checkbox Anonim */}
-          <div style={styles.checkboxGroup}>
-            <input
-              type="checkbox"
-              name="isAnonymous"
-              id="isAnonymous"
-              checked={formData.isAnonymous}
-              onChange={handleChange}
-            />
-            <label htmlFor="isAnonymous" style={{ marginLeft: '8px', cursor: 'pointer' }}>
-              Sembunyikan identitas saya (Kirim sebagai Anonim)
-            </label>
+          {/* Checkbox Anonim & Submit Button (Full Width) */}
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <div className={styles.checkboxGroup}>
+              <input
+                type="checkbox"
+                name="isAnonymous"
+                id="isAnonymous"
+                checked={formData.isAnonymous}
+                onChange={handleChange}
+                className={styles.checkboxInput}
+              />
+              <label htmlFor="isAnonymous" className={styles.checkboxLabel}>
+                Sembunyikan identitas saya (Kirim pengaduan secara anonim)
+              </label>
+            </div>
           </div>
 
-          {/* Submit Button */}
-          <button type="submit" style={styles.buttonPrimary} disabled={submitting}>
-            {submitting ? 'Mengirim Laporan...' : 'Kirim Pengaduan'}
-          </button>
+          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+            <button type="submit" className={styles.submitBtn} disabled={submitting}>
+              {submitting ? 'Mengirim Laporan ke Server...' : 'Kirim Pengaduan Sekarang'}
+            </button>
+          </div>
+
         </form>
       )}
     </div>
   );
 }
-
-// Inline Styles Sederhana
-const styles = {
-  container: { maxWidth: '600px', margin: '40px auto', padding: '30px', fontFamily: 'Arial, sans-serif', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', background: '#fff' },
-  subtitle: { color: '#666', marginBottom: '20px', fontSize: '14px' },
-  form: { display: 'flex', flexDirection: 'column', gap: '16px' },
-  formGroup: { display: 'flex', flexDirection: 'column', gap: '6px' },
-  label: { fontWeight: 'bold', fontSize: '14px', color: '#333' },
-  input: { padding: '10px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc' },
-  textarea: { padding: '10px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', resize: 'vertical' },
-  row: { display: 'flex', gap: '8px', alignItems: 'center' },
-  checkboxGroup: { display: 'flex', alignItems: 'center', marginTop: '4px' },
-  buttonPrimary: { padding: '12px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer' },
-  buttonSecondary: { padding: '10px 14px', background: '#6c757d', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '13px' },
-  previewImage: { width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ccc' },
-  successBox: { textAlign: 'center', padding: '20px', background: '#f8f9fa', borderRadius: '6px' },
-  ticketBadge: { display: 'inline-block', background: '#e2e3e5', padding: '8px 16px', fontSize: '18px', fontWeight: 'bold', borderRadius: '4px', margin: '10px 0', letterSpacing: '1px' }
-};

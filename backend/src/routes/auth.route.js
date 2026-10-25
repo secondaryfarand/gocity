@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { requireAuth } from '../middewares/auth.middleware.js'; 
+
+import { requireAuth } from '../middlewares/auth.middleware.js'; 
+import { verifyStaffRole } from '../middlewares/rbac.middleware.js'; 
+
 import { authController } from '../features/auth/auth.controller.js'; 
-
-
-// import { signUp, registerNewUser, login, loginUser, logout } from '../controllers/auth/auth.controller.js';
+import { MongoUserModel } from '../models/user.model.js'; // <-- TAMBAHKAN IMPOR INI
 
 const authRouter = Router();
 
@@ -20,9 +21,25 @@ authRouter.get('/secret-profile', requireAuth, (req, res) => {
   });
 });
 
-// authRouter.post('/auth/sync', requireAuth, authController.handleSync);
 authRouter.post('/sync', requireAuth, authController.handleSync);
 
+authRouter.get('/me', requireAuth, async (req, res) => {
+  try {
+    const clerkId = req.auth?.userId;
+    const dbUser = await MongoUserModel.findOne({ clerkId });
+
+    if (!dbUser) {
+      return res.status(404).json({ success: false, message: 'User tidak ditemukan di database lokal.' });
+    }
+
+    res.json({
+      success: true,
+      role: dbUser.role // Mengembalikan role ('staf', 'admin', atau 'user')
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
 
 export default authRouter;
 

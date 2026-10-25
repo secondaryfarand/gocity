@@ -1,4 +1,4 @@
-import { SignInButton } from '@clerk/react'; // Tombol instan bawaan Clerk
+import { SignInButton } from '@clerk/clerk-react'; // Tombol instan bawaan Clerk
 
 export function LoginPage() {
   return (

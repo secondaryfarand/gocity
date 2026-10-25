@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../middewares/auth.middleware.js'; // Sesuaikan path path middleware Anda
-import { verifyStaffRole } from '../middewares/rbac.middleware.js';
+import { requireAuth } from '../middlewares/auth.middleware.js'; // Sesuaikan path path middleware Anda
+import { verifyStaffRole } from '../middlewares/rbac.middleware.js';
 import { cctvController } from '../features/cctv/cctv.controller.js';
 
 const cctvRouter = Router();

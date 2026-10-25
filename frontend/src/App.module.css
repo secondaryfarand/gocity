@@ -1,0 +1,25 @@
+/* Layout Utama Menggunakan CSS Grid & Variabel Desain */
+.appLayout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+  background-color: var(--bg-app);
+}
+
+.mainContentWrapper {
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.pageBody {
+  padding: 30px;
+  flex: 1;
+}
+
+.loadingScreen {
+  text-align: center;
+  margin-top: 50px;
+  font-family: var(--font-family);
+  color: var(--text-muted);
+}
