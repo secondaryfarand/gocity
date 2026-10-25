@@ -26,17 +26,26 @@ authRouter.post('/sync', requireAuth, authController.handleSync);
 authRouter.get('/me', requireAuth, async (req, res) => {
   try {
     const clerkId = req.auth?.userId;
-    const dbUser = await MongoUserModel.findOne({ clerkId });
+    
+    let dbUser = await MongoUserModel.findOne({ clerkId });
 
     if (!dbUser) {
-      return res.status(404).json({ success: false, message: 'User tidak ditemukan di database lokal.' });
+      dbUser = await MongoUserModel.create({
+        clerkId: req.user.clerkId,
+        name: req.user.name,
+        email: req.user.email,
+        picture: req.user.picture,
+        role: 'warga_publik' 
+      });
+      console.log(`User baru otomatis terdaftar via /me: ${dbUser.email}`);
     }
 
     res.json({
       success: true,
-      role: dbUser.role // Mengembalikan role ('staf', 'admin', atau 'user')
+      role: dbUser.role
     });
   } catch (error) {
+    console.error("Gagal memuat/menyimpan user di /me:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
